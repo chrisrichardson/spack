@@ -11,10 +11,11 @@ class Mui(CMakePackage):
 
     homepage = "https://mxui.github.io"
     git      = "https://github.com/MxUI/MUI.git"
-    url      = "https://github.com/MxUI/MUI"
+    url      = "https://github.com/MxUI/MUI/archive/1.2.3.tar.gz"
     maintainers = ['SLongshaw', 'chrisrichardson']
 
     version('master', branch='master')
+    version('1.2.3', sha256='18af78a7e9e2b04552db104dd14f6bf7a7e5425bbca92995a30a0302cdb1d319')
 
     variant('cwrapper', default=False, description='C wrappers')
     variant('fwrapper', default=False, description='FORTRAN wrappers')
