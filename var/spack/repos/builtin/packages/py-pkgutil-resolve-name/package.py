@@ -1,4 +1,4 @@
-# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -7,7 +7,7 @@ from spack.package import *
 
 
 class PyPkgutilResolveName(PythonPackage):
-    """Resolve a name to an object. A backport of Python 3.9’s `pkgutil.resolve_name`"""
+    """Resolve a name to an object. A backport of Python 3.9 `pkgutil.resolve_name`"""
 
     homepage = "https://github.com/graingert/pkgutil-resolve-name"
     pypi = "pkgutil_resolve_name/pkgutil_resolve_name-1.3.10.tar.gz"
