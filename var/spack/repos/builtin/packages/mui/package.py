@@ -11,18 +11,17 @@ class Mui(CMakePackage):
 
     homepage = "https://mxui.github.io"
     git      = "https://github.com/MxUI/MUI.git"
-    url      = "https://github.com/MxUI/MUI/archive/1.2.3.tar.gz"
+    url      = "https://github.com/MxUI/MUI/archive/2.0.tar.gz"
     maintainers = ['SLongshaw', 'chrisrichardson']
 
     version('master', branch='master')
-    version('1.2.3', sha256='18af78a7e9e2b04552db104dd14f6bf7a7e5425bbca92995a30a0302cdb1d319')
+    version('2.0', sha256='fdddd4ffe72c22356eb53707567622a9bfb8d17836a9677a980f035e87e1b295')
 
     variant('cwrapper', default=False, description='C wrappers')
     variant('fwrapper', default=False, description='FORTRAN wrappers')
     variant('rbf', default=False, description='Radial basis function support')
 
     depends_on("cmake@3.18:", type="build")
-    depends_on("eigen@3.3:", type=("build", "run"), when="+rbf")
 
     def cmake_args(self):
         args = [
