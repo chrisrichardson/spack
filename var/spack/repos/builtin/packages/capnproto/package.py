@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -17,6 +17,8 @@ class Capnproto(AutotoolsPackage):
 
     maintainers("alexrobomind")
 
+    license("MIT")
+
     version("master", branch="master")
 
     version("0.10.2", sha256="756262841fa66260c9969e900701cc86720c2548584fb96c8153348fd7edfe69")
@@ -33,6 +35,8 @@ class Capnproto(AutotoolsPackage):
     version("0.5.1.2", sha256="e76c2b55e2b6fe8b6db8df46a348c36e7056e95507359118e54db60d746ff244")
     version("0.5.1.1", sha256="caf308e92683b278bc6c568d4fb5558eca78180cac1eb4a3db15d435bf25116f")
     version("0.4.1.2", sha256="6376c1910e9bc9d09dc46d53b063c5bdcb5cdf066a8210e9fffe299fb863f0d9")
+
+    depends_on("cxx", type="build")  # generated
 
     depends_on("zlib-api", when="+zlib")
     depends_on("openssl", when="+tls")

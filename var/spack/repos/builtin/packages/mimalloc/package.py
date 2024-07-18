@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -13,6 +13,8 @@ class Mimalloc(CMakePackage):
     url = "https://github.com/microsoft/mimalloc/archive/v0.0.0.tar.gz"
     git = "https://github.com/microsoft/mimalloc.git"
     maintainers("msimberg")
+
+    license("MIT")
 
     version("dev-slice", branch="dev-slice")
     version("dev", branch="dev")
@@ -29,6 +31,9 @@ class Mimalloc(CMakePackage):
     version("1.7.9", sha256="45e05be518363d32b2cdcce1a1fac3580895ea2e4524e1a3c7e71145cb58659f")
     version("1.7.7", sha256="0f6663be1e1764851bf9563fcf7a6b3330e23b933eb4737dd07e3289b87895fe")
     version("1.7.6", sha256="d74f86ada2329016068bc5a243268f1f555edd620b6a7d6ce89295e7d6cf18da")
+
+    depends_on("c", type="build")  # generated
+    depends_on("cxx", type="build")  # generated
 
     depends_on("cmake@3.0:", type="build")
 
@@ -115,4 +120,9 @@ class Mimalloc(CMakePackage):
             for lib in self.libs_values
         ]
         args += [self.define_from_variant("MI_%s" % k.upper(), k) for k in self.mimalloc_options]
+
+        # Use LTO also for non-Intel compilers please. This can be removed when they
+        # bump cmake_minimum_required to VERSION 3.9.
+        if "+ipo" in self.spec:
+            args.append("-DCMAKE_POLICY_DEFAULT_CMP0069=NEW")
         return args

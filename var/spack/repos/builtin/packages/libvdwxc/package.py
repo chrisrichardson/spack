@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -14,7 +14,12 @@ class Libvdwxc(AutotoolsPackage):
     homepage = "https://libvdwxc.gitlab.io/libvdwxc/"
     url = "https://launchpad.net/libvdwxc/stable/0.4.0/+download/libvdwxc-0.4.0.tar.gz"
 
+    license("GPL-3.0-or-later")
+
     version("0.4.0", sha256="3524feb5bb2be86b4688f71653502146b181e66f3f75b8bdaf23dd1ae4a56b33")
+
+    depends_on("c", type="build")  # generated
+    depends_on("fortran", type="build")  # generated
 
     variant("mpi", default=True, description="Enable MPI support")
     variant("pfft", default=False, description="Enable support for PFFT")

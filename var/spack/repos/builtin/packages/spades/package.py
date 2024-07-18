@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -21,6 +21,9 @@ class Spades(CMakePackage):
     version("3.12.0", sha256="15b48a3bcbbe6a8ad58fd04ba5d3f1015990fbfd9bdf4913042803b171853ac7")
     version("3.11.1", sha256="3ab85d86bf7d595bd8adf11c971f5d258bbbd2574b7c1703b16d6639a725b474")
     version("3.10.1", sha256="d49dd9eb947767a14a9896072a1bce107fb8bf39ed64133a9e2f24fb1f240d96")
+
+    depends_on("c", type="build")  # generated
+    depends_on("cxx", type="build")  # generated
 
     depends_on("python", type=("build", "run"))
     depends_on("zlib-api")

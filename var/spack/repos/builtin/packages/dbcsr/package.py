@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -16,6 +16,8 @@ class Dbcsr(CMakePackage, CudaPackage, ROCmPackage):
 
     maintainers("dev-zero", "mtaillefumier")
 
+    license("GPL-2.0-or-later")
+
     version("develop", branch="develop")
     version("2.6.0", sha256="c67b02ff9abc7c1f529af446a9f01f3ef9e5b0574f220259128da8d5ca7e9dc6")
     version("2.5.0", sha256="91fda9b2502e5d0a2a6cdd5a73ef096253cc7e75bd01ba5189a4726ad86aef08")
@@ -25,6 +27,10 @@ class Dbcsr(CMakePackage, CudaPackage, ROCmPackage):
     version("2.2.0", sha256="245b0382ddc7b80f85af8288f75bd03d56ec51cdfb6968acb4931529b35173ec")
     version("2.1.0", sha256="9e58fd998f224632f356e479d18b5032570d00d87b86736b6a6ac2d03f8d4b3c")
     version("2.0.1", sha256="61d5531b661e1dab043353a1d67939ddcde3893d3dc7b0ab3d05074d448b485c")
+
+    depends_on("c", type="build")  # generated
+    depends_on("cxx", type="build")  # generated
+    depends_on("fortran", type="build")  # generated
 
     variant("mpi", default=True, description="Compile with MPI")
     variant("openmp", default=False, description="Build with OpenMP support")
@@ -44,6 +50,7 @@ class Dbcsr(CMakePackage, CudaPackage, ROCmPackage):
             " with cuda_arch=35 for a K20x instead of a K40"
         ),
     )
+    variant("examples", default=True, description="Build examples")
 
     variant("opencl", default=False, description="Enable OpenCL backend")
     variant("mpi_f08", default=False, when="@2.6:", description="Use mpi F08 module")
@@ -51,7 +58,10 @@ class Dbcsr(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("blas")
     depends_on("lapack")
     depends_on("mpi", when="+mpi")
-    depends_on("libxsmm@1.11:~header-only", when="smm=libxsmm")
+
+    with when("smm=libxsmm"):
+        depends_on("libxsmm~header-only")
+        depends_on("libxsmm@1.11:1")
 
     depends_on("cmake@3.10:", type="build")
     depends_on("cmake@3.12:", type="build", when="@2.1:")
@@ -66,6 +76,9 @@ class Dbcsr(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("hipblas", when="+rocm")
 
     depends_on("opencl", when="+opencl")
+
+    # All examples require MPI
+    conflicts("+examples", when="~mpi", msg="Examples require MPI")
 
     # We only support specific gpu archs for which we have parameter files
     # for optimal kernels. Note that we don't override the parent class arch
@@ -98,6 +111,14 @@ class Dbcsr(CMakePackage, CudaPackage, ROCmPackage):
 
     conflicts("smm=blas", when="+opencl")
 
+    with when("+mpi"):
+        # When using mpich 4.1 or higher, mpi_f08 has to be used, otherwise:
+        # Error: Type mismatch in argument 'baseptr' at (1); passed TYPE(c_ptr)
+        # to INTEGER(8)
+        conflicts("^mpich@4.1:", when="@:2.5")
+        conflicts("~mpi_f08", when="^mpich@4.1:")
+        depends_on("mpich+fortran", when="^[virtuals=mpi] mpich")
+
     generator("ninja")
     depends_on("ninja@1.10:", type="build")
 
@@ -121,6 +142,7 @@ class Dbcsr(CMakePackage, CudaPackage, ROCmPackage):
             "-DLAPACK_FOUND=true",
             "-DLAPACK_LIBRARIES=%s" % (spec["lapack"].libs.joined(";")),
             self.define_from_variant("BUILD_SHARED_LIBS", "shared"),
+            self.define_from_variant("WITH_EXAMPLES", "examples"),
         ]
 
         # Switch necessary as a result of a bug.

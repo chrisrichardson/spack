@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -24,6 +24,10 @@ class Hdf(AutotoolsPackage):
     version("4.2.13", sha256="be9813c1dc3712c2df977d4960e1f13f20f447dfa8c3ce53331d610c1f470483")
     version("4.2.12", sha256="dd419c55e85d1a0e13f3ea5ed35d00710033ccb16c85df088eb7925d486e040c")
     version("4.2.11", sha256="c3f7753b2fb9b27d09eced4d2164605f111f270c9a60b37a578f7de02de86d24")
+
+    depends_on("c", type="build")  # generated
+    depends_on("cxx", type="build")  # generated
+    depends_on("fortran", type="build")  # generated
 
     variant("szip", default=False, description="Enable szip support")
     variant(
@@ -132,7 +136,7 @@ class Hdf(AutotoolsPackage):
             libs += self.spec["zlib:transitive"].libs
             if "+szip" in self.spec:
                 libs += self.spec["szip:transitive"].libs
-            if "+external-xdr" in self.spec and self.spec["rpc"].name != "libc":
+            if "+external-xdr" in self.spec and self.spec["rpc"].name == "libtirpc":
                 libs += self.spec["rpc:transitive"].libs
 
         return libs
@@ -146,10 +150,14 @@ class Hdf(AutotoolsPackage):
 
         if name == "cflags":
             # https://forum.hdfgroup.org/t/help-building-hdf4-with-clang-error-implicit-declaration-of-function-test-mgr-szip-is-invalid-in-c99/7680
-            if self.spec.satisfies("@:4.2.15 %apple-clang") or self.spec.satisfies("%clang@16:"):
+            if (
+                self.spec.satisfies("@:4.2.15 %apple-clang")
+                or self.spec.satisfies("%clang@16:")
+                or self.spec.satisfies("%oneapi")
+            ):
                 flags.append("-Wno-error=implicit-function-declaration")
 
-            if self.spec.satisfies("%clang@16:"):
+            if self.spec.satisfies("%clang@16:") or self.spec.satisfies("%apple-clang@15:"):
                 flags.append("-Wno-error=implicit-int")
 
         return flags, None, None
@@ -174,7 +182,7 @@ class Hdf(AutotoolsPackage):
 
         if "~external-xdr" in self.spec:
             config_args.append("--enable-hdf4-xdr")
-        elif self.spec["rpc"].name != "libc":
+        elif self.spec["rpc"].name == "libtirpc":
             # We should not specify '--disable-hdf4-xdr' due to a bug in the
             # configure script.
             config_args.append("LIBS=%s" % self.spec["rpc"].libs.link_flags)
@@ -196,6 +204,10 @@ class Hdf(AutotoolsPackage):
             make("check", parallel=False)
 
     extra_install_tests = join_path("hdf", "util", "testfiles")
+
+    # Filter h4cc compiler wrapper to substitute the Spack compiler
+    # wrappers with the path of the underlying compilers.
+    filter_compiler_wrappers("h4cc", relative_root="bin")
 
     @property
     def cached_tests_work_dir(self):

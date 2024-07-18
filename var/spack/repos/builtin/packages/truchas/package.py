@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -26,6 +26,10 @@ class Truchas(CMakePackage):
     version("develop", branch="master")
     version("23.06", sha256="a786caba5129d7e33ba42a06751d6c570bd3b9697e3404276a56216d27820c68")
     version("22.04.1", sha256="ed2000f27ee5c4bd3024063a374023878c61e8a3c76c37542fffd341d1226dc1")
+
+    depends_on("c", type="build")  # generated
+    depends_on("cxx", type="build")  # generated
+    depends_on("fortran", type="build")  # generated
 
     # ------------------------------------------------------------ #
     # Variants
